@@ -1,9 +1,11 @@
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.*;
-import java.util.Calendar;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public class Demo{
     public static void main(String[] args) {
@@ -13,6 +15,8 @@ public class Demo{
         // get UTC time
         LocalDateTime nowUTC = LocalDateTime.now(ZoneOffset.UTC);
         System.out.println("now " + nowUTC);
+
+        Timestamp tsUTC = Timestamp.valueOf(nowUTC);
 
         // convert to local time
         LocalDateTime lct = nowUTC.atOffset(ZoneOffset.UTC).atZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
@@ -24,16 +28,52 @@ public class Demo{
 
 
         // TH2:
-        LocalDateTime lc = LocalDateTime.now().atOffset(ZoneOffset.UTC).toLocalDateTime();
-        System.out.println("lc " + lc);
+//        LocalDateTime lc = LocalDateTime.now().atOffset(ZoneOffset.UTC).toLocalDateTime();
+//        System.out.println("lc " + lc);
 
 
         // Convert Long to time
-        Instant time= Instant.ofEpochMilli(cv);
+        Instant time= Instant.ofEpochMilli(1701310074910L);
 
         LocalDateTime check = LocalDateTime.ofInstant(time, ZoneOffset.systemDefault());
-        System.out.println(check);
+        Timestamp cv4 = Timestamp.valueOf(check);
+        System.out.println(cv4);
 
+        LocalDateTime cv5 = time.atOffset(ZoneOffset.UTC).atZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
+        Timestamp cv6 = Timestamp.valueOf(cv5);
+
+        cv5.toString();
+
+
+
+        BigDecimal bd = new BigDecimal("2.11633419E8");
+        long val = bd.longValue();
+
+        String a = "2.0E10";
+        BigDecimal cva = BigDecimal.valueOf(Double.parseDouble(a));
+        System.out.println(cva);
+
+
+        BigDecimal myNumber = new BigDecimal("2.0E10");
+
+//        double myDouble = myNumber.doubleValue();
+
+        NumberFormat formatter = new DecimalFormat("#.##########");
+        BigDecimal fm = new BigDecimal(formatter.format(myNumber));
+        System.out.println(fm);
+
+        // 1701174785159
+
+
+        Timestamp timestamp = new Timestamp(1701176751171L);
+        System.out.println(timestamp.toString());
+
+//        String time7 = Instant.ofEpochMilli(1701243591550L).toString();
+//        System.out.println("time7 " + time7);
+//
+//        String time8 = new Timestamp(1701243591550L).toString();
+//        System.out.println("time8 " + time8);
+//
 
 //        System.out.print("goodbye");
 //        System.out.println(" my love");
@@ -85,50 +125,37 @@ public class Demo{
 //        System.out.println(text2);
 
 
-//        int hour = 14;
-//        int minute = 19;
-//        int second = 20;
-//
-//        int totalSecond;
-//        System.out.println(hour + ":" + minute + ":" + second);
-//
-//        totalSecond = (minute * 60) + (60 * 60 * hour);
-//        System.out.println("total second from mid night: " + totalSecond );
-//
-//        totalSecond = ((60 - minute) * 60) + ((24 - hour) * 60 * 60);
-//        System.out.println("total second from now to mid night: " + totalSecond );
-
-
-//        double x =  1;
-//        double y = 3;
-//
-//        int a = 1;
-//        int b = 3;
-//        System.out.println(x/y);
-//
-//        System.out.println(a/b);
-
-//        zippo("rattle1", 13);
-
-//        int bizz = 5;
-//        int buzz = 2;
-//        zoop("just for", bizz);
-//        clink(2*buzz);
-
-//        check_fermat(2, 3, 4, 1);
-
-//        System.out.println(first("viet"));
-//        System.out.println(rest("viet"));
-//        System.out.println(length("viet"));
-
-//        String a = "viet";
-//        printString(a);
-//        printBack(a);
-//
-//        System.out.println(reverseString(a));
-
-//        loop(10);
     }
+
+    public static long calculateValueWithExchangeRate(long value, long contractSize, long exchangeRate) {
+        BigDecimal rate = BigDecimal.valueOf(exchangeRate * 1.0 / contractSize);
+
+        return rate
+                .multiply(BigDecimal.valueOf(value))
+                .longValue();
+    }
+
+    public static String timestampToString(Timestamp timestamp, String format) {
+        return new SimpleDateFormat(format).format(new Date(timestamp.getTime()));
+    }
+
+    public static long setScale(long value, int scale, long contractSize, RoundingMode mode) {
+        if (contractSize <= 0)
+            return value;
+
+        BigDecimal valueDecimal = new BigDecimal(String.valueOf(value))
+                .divide(new BigDecimal(String.valueOf(contractSize)), scale, mode);
+
+        return valueDecimal.multiply(new BigDecimal(String.valueOf(contractSize))).longValue();
+    }
+
+    public static long calculateValueWithExchangeRate1(long value, long exchangeRate, long contractSize) {
+        long amount = calculateValueWithExchangeRate(value, contractSize, exchangeRate);
+        return setScale(amount, 0, contractSize, RoundingMode.DOWN);
+
+
+    }
+
 
     public static void loop(int n) {
         int i = n;
